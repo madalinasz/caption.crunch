@@ -1,0 +1,17 @@
+node_modules/
+coverage/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo
+*.mp4
+*.srt
+*.vtt
+!tests/fixtures/
+!tests/fixtures/source-with-audio.mp4
+!tests/fixtures/accented.srt
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
