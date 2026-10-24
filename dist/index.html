@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Burn translated SRT subtitles into MP4 videos, entirely in your browser." />
+    <meta name="theme-color" content="#f6f7f2" />
+    <title>Caption Crunch</title>
+    <script type="module" crossorigin src="/assets/index-DDypjusy.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Zk2jl7gt.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="Caption Crunch home">
+          <span class="brand-mark" aria-hidden="true">CC</span>
+          <span>Caption Crunch</span>
+        </a>
+        <span class="privacy-badge"><span aria-hidden="true">●</span> Files stay on this device</span>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <p class="eyebrow">LOCAL VIDEO TOOL</p>
+          <h1 id="page-title">Make translated training videos, privately.</h1>
+          <p class="lede">Add an MP4 and its translated SRT. Preview the captions, tune their appearance, then create a new MP4 with the subtitles permanently burned in.</p>
+        </section>
+
+        <section class="upload-grid" aria-label="Choose source files">
+          <label class="drop-zone" id="video-drop" data-testid="video-drop">
+            <input id="video-input" type="file" accept="video/mp4,.mp4" />
+            <span class="step-number">1</span>
+            <span class="upload-icon" aria-hidden="true">▶</span>
+            <strong>Choose your MP4</strong>
+            <span class="upload-help">Click to browse or drop it here</span>
+            <span class="file-summary" id="video-summary">MP4 video</span>
+          </label>
+
+          <label class="drop-zone" id="srt-drop" data-testid="srt-drop">
+            <input id="srt-input" type="file" accept="application/x-subrip,text/plain,.srt" />
+            <span class="step-number">2</span>
+            <span class="upload-icon document" aria-hidden="true">≡</span>
+            <strong>Choose translated subtitles</strong>
+            <span class="upload-help">A UTF-8 or UTF-16 SRT file</span>
+            <span class="file-summary" id="srt-summary">SRT subtitles</span>
+          </label>
+        </section>
+
+        <div class="message" id="message" role="alert" hidden></div>
+        <div class="message warning" id="memory-warning" role="status" hidden></div>
+
+        <section class="editor" id="editor" aria-labelledby="editor-title">
+          <div class="preview-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">PREVIEW</p>
+                <h2 id="editor-title">Check the timing and look</h2>
+              </div>
+              <span id="video-meta" class="metadata">Waiting for an MP4</span>
+            </div>
+
+            <div class="video-stage" id="video-stage">
+              <video id="video" controls preload="metadata" playsinline></video>
+              <canvas id="subtitle-canvas" aria-hidden="true"></canvas>
+              <div class="empty-preview" id="empty-preview">
+                <span aria-hidden="true">▶</span>
+                <p>Your video preview will appear here</p>
+              </div>
+            </div>
+            <p class="preview-note"><span aria-hidden="true">◎</span> The preview uses the same renderer and proportions as the exported video.</p>
+          </div>
+
+          <aside class="settings-panel" aria-label="Subtitle settings">
+            <div class="setting-group">
+              <div class="setting-title"><span class="setting-number">3</span><h3>Caption size</h3></div>
+              <div class="segmented" id="size-selector" role="radiogroup" aria-label="Caption size">
+                <button type="button" role="radio" aria-checked="false" data-size="small">Small</button>
+                <button type="button" class="selected" role="radio" aria-checked="true" data-size="medium">Medium</button>
+                <button type="button" role="radio" aria-checked="false" data-size="large">Large</button>
+              </div>
+            </div>
+
+            <div class="setting-group compact-grid">
+              <label>
+                <span>Text colour</span>
+                <span class="colour-field"><input id="text-colour" type="color" value="#ffffff" /><output id="colour-value">#FFFFFF</output></span>
+              </label>
+              <label>
+                <span>Backing</span>
+                <select id="backing">
+                  <option value="outline">Black outline</option>
+                  <option value="panel">Dark panel</option>
+                  <option value="none">None</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="setting-group">
+              <label class="range-label" for="position"><span>Vertical position</span><output id="position-value">8% from bottom</output></label>
+              <input id="position" type="range" min="4" max="28" value="8" step="1" />
+              <div class="range-ends"><span>Lower</span><span>Higher</span></div>
+            </div>
+
+            <div class="setting-group">
+              <label for="language-suffix"><span>Language suffix</span></label>
+              <div class="suffix-field"><span>_</span><input id="language-suffix" type="text" maxlength="24" placeholder="fr" autocomplete="off" /></div>
+              <p class="field-help">Example: <strong id="filename-example">training_fr.mp4</strong></p>
+            </div>
+          </aside>
+        </section>
+
+        <section class="export-card" aria-labelledby="export-title">
+          <div class="export-copy">
+            <span class="step-number inline">4</span>
+            <div>
+              <h2 id="export-title">Create your captioned video</h2>
+              <p>Encoding happens on this device. Keep this tab open until it finishes.</p>
+            </div>
+          </div>
+          <div class="export-actions">
+            <button type="button" class="button secondary" id="start-over">Start over</button>
+            <button type="button" class="button primary" id="generate" disabled><span aria-hidden="true">✦</span> Generate video</button>
+          </div>
+
+          <div class="progress-area" id="progress-area" hidden aria-live="polite">
+            <div class="progress-heading"><strong id="progress-label">Preparing video…</strong><span id="progress-percent">0%</span></div>
+            <progress id="progress" max="100" value="0">0%</progress>
+            <div class="progress-detail"><span id="progress-detail">Analysing the MP4</span><button type="button" class="link-button" id="cancel">Cancel</button></div>
+          </div>
+
+          <div class="download-area" id="download-area" hidden>
+            <div class="success-mark" aria-hidden="true">✓</div>
+            <div><strong>Your captioned MP4 is ready</strong><p id="output-summary"></p></div>
+            <a class="button download" id="download" download><span aria-hidden="true">↓</span> Download MP4</a>
+          </div>
+        </section>
+
+        <section class="how-it-works" aria-label="How it works">
+          <div><span aria-hidden="true">⌁</span><strong>No uploads</strong><p>Video, subtitles and filenames never leave your browser.</p></div>
+          <div><span aria-hidden="true">▣</span><strong>Real MP4 output</strong><p>H.264 video with captions permanently rendered into every frame.</p></div>
+          <div><span aria-hidden="true">♫</span><strong>Audio retained</strong><p>The original audio track and timing are preserved.</p></div>
+        </section>
+      </main>
+
+      <footer><span>Caption Crunch</span><span>Private by design · No accounts · No telemetry</span></footer>
+    </div>
+  </body>
+</html>
+
