@@ -10,6 +10,7 @@ test-results/
 !tests/fixtures/
 !tests/fixtures/source-with-audio.mp4
 !tests/fixtures/accented.srt
+!tests/fixtures/accented.vtt
 .DS_Store
 Thumbs.db
 .env
