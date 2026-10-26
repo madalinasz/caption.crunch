@@ -1,6 +1,6 @@
 import './styles.css';
 import { outputFilename, fileStem } from './filename';
-import { activeCuesAt, parseSrt, readSubtitleFile, SrtParseError } from './subtitles';
+import { activeCuesAt, parseSrt, parseSubtitles, readSubtitleFile, subtitleFormatFromFilename, SubtitleParseError } from './subtitles';
 import { renderSubtitles } from './render-subtitles';
 import type { CaptionBacking, CaptionSize, SubtitleCue, SubtitleStyle, WorkerResponse } from './types';
 
@@ -113,9 +113,27 @@ function drawPreview(): void {
 
 function schedulePreviewFrame(): void {
   drawPreview();
-  if (!video.paused && 'requestVideoFrameCallback' in video) {
+  if (video.paused || video.ended) return;
+  if ('requestVideoFrameCallback' in video) {
     video.requestVideoFrameCallback(() => schedulePreviewFrame());
+  } else {
+    requestAnimationFrame(schedulePreviewFrame);
   }
+}
+
+function revealFirstCue(): void {
+  if (!videoFile || cues.length === 0 || video.readyState < HTMLMediaElement.HAVE_METADATA) {
+    drawPreview();
+    return;
+  }
+
+  if (activeCuesAt(cues, video.currentTime).length === 0) {
+    const firstCue = cues.find((cue) => cue.start < video.duration);
+    if (firstCue) {
+      video.currentTime = Math.max(firstCue.start, Math.min(firstCue.start + 0.05, firstCue.end - 0.001));
+    }
+  }
+  drawPreview();
 }
 
 function waitForMetadata(): Promise<void> {
@@ -156,7 +174,7 @@ async function selectVideo(file: File): Promise<void> {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     videoMeta.textContent = `${video.videoWidth} × ${video.videoHeight} · ${formatTime(video.duration)} · ${formatBytes(file.size)}`;
-    drawPreview();
+    revealFirstCue();
   } catch (error) {
     videoFile = null;
     showMessage(error instanceof Error ? error.message : 'This MP4 could not be opened.');
@@ -167,22 +185,23 @@ async function selectVideo(file: File): Promise<void> {
 async function selectSubtitles(file: File): Promise<void> {
   clearMessage();
   clearOutput();
-  if (!file.name.toLowerCase().endsWith('.srt')) {
-    showMessage('Choose an SRT subtitle file.');
+  const format = subtitleFormatFromFilename(file.name);
+  if (!format) {
+    showMessage('Choose an SRT or VTT subtitle file.');
     return;
   }
 
   try {
-    const parsed = parseSrt(await readSubtitleFile(file));
+    const parsed = parseSubtitles(await readSubtitleFile(file), format);
     subtitleFile = file;
     cues = parsed;
     srtDrop.classList.add('has-file');
     srtSummary.textContent = `${file.name} · ${parsed.length} subtitle${parsed.length === 1 ? '' : 's'}`;
-    drawPreview();
+    revealFirstCue();
   } catch (error) {
     subtitleFile = null;
     cues = [];
-    const text = error instanceof SrtParseError ? error.message : 'This SRT file could not be read.';
+    const text = error instanceof SubtitleParseError ? error.message : 'This subtitle file could not be read.';
     showMessage(text);
   }
   updateReadyState();
@@ -301,7 +320,7 @@ function reset(): void {
   videoDrop.classList.remove('has-file');
   srtDrop.classList.remove('has-file');
   videoSummary.textContent = 'MP4 video';
-  srtSummary.textContent = 'SRT subtitles';
+  srtSummary.textContent = 'SRT or VTT subtitles';
   videoMeta.textContent = 'Waiting for an MP4';
   emptyPreview.hidden = false;
   memoryWarning.hidden = true;
@@ -364,7 +383,7 @@ suffixInput.addEventListener('input', updateFilenameExample);
 video.addEventListener('play', schedulePreviewFrame);
 video.addEventListener('timeupdate', drawPreview);
 video.addEventListener('seeked', drawPreview);
-video.addEventListener('loadeddata', drawPreview);
+video.addEventListener('loadeddata', revealFirstCue);
 generateButton.addEventListener('click', generateVideo);
 startOverButton.addEventListener('click', reset);
 cancelButton.addEventListener('click', () => {
@@ -379,5 +398,5 @@ updateFilenameExample();
 
 // Exposed only for deterministic browser tests; no user data leaves the page.
 if (import.meta.env.DEV) {
-  Object.assign(window, { __captionCrunch: { parseSrt, fileStem, currentStyle } });
+  Object.assign(window, { __captionCrunch: { parseSrt, parseSubtitles, fileStem, currentStyle } });
 }
