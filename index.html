@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Burn translated SRT subtitles into MP4 videos, entirely in your browser." />
+    <meta name="description" content="Burn translated SRT or VTT subtitles into MP4 videos, entirely in your browser." />
     <meta name="theme-color" content="#f6f7f2" />
     <title>Caption Crunch</title>
   </head>
@@ -21,7 +21,7 @@
         <section class="intro" aria-labelledby="page-title">
           <p class="eyebrow">LOCAL VIDEO TOOL</p>
           <h1 id="page-title">Make translated training videos, privately.</h1>
-          <p class="lede">Add an MP4 and its translated SRT. Preview the captions, tune their appearance, then create a new MP4 with the subtitles permanently burned in.</p>
+          <p class="lede">Add an MP4 and translated SRT or VTT subtitles. Preview the captions, tune their appearance, then create a new MP4 with the subtitles permanently burned in.</p>
         </section>
 
         <section class="upload-grid" aria-label="Choose source files">
@@ -35,12 +35,12 @@
           </label>
 
           <label class="drop-zone" id="srt-drop" data-testid="srt-drop">
-            <input id="srt-input" type="file" accept="application/x-subrip,text/plain,.srt" />
+            <input id="srt-input" type="file" accept="application/x-subrip,text/vtt,text/plain,.srt,.vtt" />
             <span class="step-number">2</span>
             <span class="upload-icon document" aria-hidden="true">≡</span>
             <strong>Choose translated subtitles</strong>
-            <span class="upload-help">A UTF-8 or UTF-16 SRT file</span>
-            <span class="file-summary" id="srt-summary">SRT subtitles</span>
+            <span class="upload-help">A UTF-8 or UTF-16 SRT or VTT file</span>
+            <span class="file-summary" id="srt-summary">SRT or VTT subtitles</span>
           </label>
         </section>
 

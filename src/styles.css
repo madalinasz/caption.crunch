@@ -61,9 +61,9 @@ h1 { margin-bottom: 16px; color: var(--green); font-size: clamp(38px, 5vw, 66px)
 .section-heading h2 { margin: 0; color: var(--ink); font-size: 22px; letter-spacing: -.025em; }
 .metadata { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .video-stage { position: relative; display: grid; place-items: center; min-height: 360px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; background: #142019; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
-.video-stage video { width: 100%; height: 100%; display: block; object-fit: contain; background: #050806; }
-.video-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-.empty-preview { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; color: #c8d2ca; background: linear-gradient(145deg, #15251d, #0a120e); }
+.video-stage video { position: relative; z-index: 0; width: 100%; height: 100%; display: block; object-fit: contain; background: #050806; }
+.video-stage canvas { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.empty-preview { position: absolute; z-index: 2; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; color: #c8d2ca; background: linear-gradient(145deg, #15251d, #0a120e); }
 .empty-preview[hidden] { display: none; }
 .empty-preview span { width: 56px; height: 56px; display: grid; place-items: center; padding-left: 4px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; background: rgba(255,255,255,.07); }
 .empty-preview p { margin: 0; font-size: 14px; }

@@ -12,6 +12,7 @@ function plainText(value: string): string {
   return value
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/?(?:i|b|u|font|span)(?:\s[^>]*)?>/gi, '')
+    .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
